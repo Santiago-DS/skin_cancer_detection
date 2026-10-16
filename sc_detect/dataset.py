@@ -1,29 +1,33 @@
 from pathlib import Path
 
+import kagglehub
 from loguru import logger
-from tqdm import tqdm
 import typer
 
-from sc_detect.config import PROCESSED_DATA_DIR, RAW_DATA_DIR
+from sc_detect.config import RAW_DATA_DIR
 
 app = typer.Typer()
 
-
 @app.command()
 def main(
-    # ---- REPLACE DEFAULT PATHS AS APPROPRIATE ----
-    input_path: Path = RAW_DATA_DIR / "dataset.csv",
-    output_path: Path = PROCESSED_DATA_DIR / "dataset.csv",
-    # ----------------------------------------------
+    competition_name: str = "isic-2024-challenge",
+    output_dir: Path = RAW_DATA_DIR,
 ):
-    # ---- REPLACE THIS WITH YOUR OWN CODE ----
-    logger.info("Processing dataset...")
-    for i in tqdm(range(10), total=10):
-        if i == 5:
-            logger.info("Something happened for iteration 5.")
-    logger.success("Processing dataset complete.")
-    # -----------------------------------------
+    # login
+    logger.info("Realize o login no Kaggle:")
+    kagglehub.login()
+    logger.success("Login realizado com sucesso!")
 
+    # download dos dados
+    str_path = str(output_dir.resolve())  # a funcao espera receber uma string
+
+    logger.info("Realizando o download dos dados...")
+    kagglehub.competition_download(
+        handle=competition_name,
+        output_dir=str_path,
+        force_download=True  # forcar atualizacao dos dados caso existam
+    )
+    logger.success("Download concluido com sucesso!")
 
 if __name__ == "__main__":
     app()
